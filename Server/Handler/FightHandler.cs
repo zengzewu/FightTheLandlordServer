@@ -34,7 +34,18 @@ namespace Server.Handler
         private void Leave(ClientPeer clientPeer)
         {
             int aid = accountCache.GetId(clientPeer);
+            if(aid==-1)
+            {
+                //客户端未登陆
+                return;
+            }
             int uid = userModelCache.GetUserIdByAid(aid);
+            if(uid==-1)
+            {
+                //该账号下没有角色
+                return;
+            }
+
             FightRoomModel room = fightRoomCache.GetFightRoomByUid(uid);
             if(room!=null)
             {
@@ -160,7 +171,7 @@ namespace Server.Handler
                 #region 更新地主玩家的信息，增加豆子，增加经验
                 UserModel userModel = userModelCache.GetModelByUid(uid);
                 userModel.Been += room.Multiple * 100 * 2;
-                userModel.Exp += 20;
+                userModel.AddExp(20);
                 userModelCache.Update(userModel);
                 #endregion
 
@@ -169,7 +180,7 @@ namespace Server.Handler
                 {
                     UserModel user = userModelCache.GetModelByUid(u.Uid);
                     user.Been -= room.Multiple * 100;
-                    user.Exp += 10;
+                    user.AddExp(10);
                     userModelCache.Update(user);
                 });
                 #endregion
@@ -182,7 +193,7 @@ namespace Server.Handler
                 {
                     UserModel user = userModelCache.GetModelByUid(u.Uid);
                     user.Been += room.Multiple * 100;
-                    user.Exp += 20;
+                    user.AddExp(20);
                     userModelCache.Update(user);
                 });
                 #endregion
@@ -192,7 +203,7 @@ namespace Server.Handler
                 {
                     UserModel user = userModelCache.GetModelByUid(u.Uid);
                     user.Been -= room.Multiple * 100 * 2;
-                    user.Exp += 20;
+                    user.AddExp(10);
                     userModelCache.Update(user);
                 });
                 #endregion
@@ -202,7 +213,6 @@ namespace Server.Handler
             userModelCache.GetModelsByUids(room.EscapePlayerId).ForEach(u =>
             {
                 u.Been -= room.Multiple * 100;
-                u.Exp -= 20;
                 userModelCache.Update(u);
 
             });
@@ -221,8 +231,13 @@ namespace Server.Handler
             //广播游戏结束消息
             Brocast(room, OpCode.FIGHT, FightCode.OVER, overDto);
 
+            //摧毁匹配房间
+            RoomCache roomCache = Caches.RoomCache;
+            roomCache.DestoryRoom(roomCache.GetRoomModelByUid(room.GetFirstUid()));
+
             //摧毁战斗房间
             fightRoomCache.DestoryRoom(room);
+            
         }
 
         /// <summary>

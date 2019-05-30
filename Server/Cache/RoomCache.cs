@@ -129,6 +129,16 @@ namespace Server.Cache
         /// <param name="roomModel">房间模型</param>
         public void DestoryRoom(RoomModel roomModel)
         {
+            //移除房间数据模型
+            ridRoomModelDict.Remove(roomModel.Id);
+
+            //移除匹配队列
+            foreach (var item in roomModel.uidList)
+            {
+                uidRidDict.Remove(item.Key);
+            }
+
+
             roomModel.Initialise();//初始化房间数据
             roomQueue.Enqueue(roomModel);//将房间加入重用队列
         }

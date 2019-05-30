@@ -151,9 +151,16 @@ namespace Server.Cache
         /// <returns>账号名</returns>
         public int GetId(ClientPeer clientPeer)
         {
-            string acc = clientPeerAcc[clientPeer];
-            AccountModel model = accModelDict[acc];
-            return model.id;
+            if(clientPeerAcc.ContainsKey(clientPeer))
+            {
+                string acc = clientPeerAcc[clientPeer];
+                AccountModel model = accModelDict[acc];
+                return model.id;
+            }
+            else
+            {
+                return -1;
+            }
         }
         /// <summary>
         /// 根据id获取连接对象

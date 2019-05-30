@@ -106,8 +106,9 @@ namespace Server.Handler
                 if (roomModel.IsAllReady())
                 {
                     //向客户端发送开始游戏的响应
-                    roomModel.Brocast(null, null, OpCode.MATCH, MatchCode.START_BRO);
+                    roomModel.Brocast(null, null, OpCode.MATCH, MatchCode.START_BRO);                   
                     StartEvent.Invoke(roomModel.GetAllReadyUserIdInRoom());
+
                 }
             });
         }

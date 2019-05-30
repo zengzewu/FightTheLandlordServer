@@ -67,7 +67,11 @@ namespace Server.Cache
         /// <returns>角色Id</returns>
         public int GetUserIdByAid(int aid)
         {
-            return accidUidDict[aid];
+            if (accidUidDict.ContainsKey(aid))
+                return accidUidDict[aid];
+            else
+                return -1;
+
         }
 
         /// <summary>

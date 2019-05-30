@@ -19,5 +19,39 @@ namespace Protocol.Constant
         /// 地主
         /// </summary>
         public const int LANDLORD = 2;
+
+        /// <summary>
+        /// 根据身份数字获取身份文字
+        /// </summary>
+        /// <returns></returns>
+        public static string GetString(int identity)
+        {
+            switch(identity)
+            {
+                case 1:
+                    return "农民";
+                case 2:
+                    return "地主";
+                default:
+                    return "未知";
+            }
+        }
+
+        /// <summary>
+        /// 获取相反身份
+        /// </summary>
+        /// <returns></returns>
+        public static string GetOpposite(int identity)
+        {
+            switch (identity)
+            {
+                case 1:
+                    return "地主";
+                case 2:
+                    return "农民";
+                default:
+                    return "未知";
+            }
+        }
     }
 }

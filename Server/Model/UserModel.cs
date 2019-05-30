@@ -71,5 +71,18 @@ namespace Server.Model
             this.Exp = 0;
             this.AccountId = accountId;
         }
+
+        /// <summary>
+        /// 增加经验
+        /// </summary>
+        /// <param name="addExp"></param>
+        public void AddExp(int addExp)
+        {
+            Exp += addExp;
+            if (Exp > Lv * 100)
+            {
+                Lv++;
+            }
+        }
     }
 }
