@@ -27,7 +27,7 @@ namespace Protocol.Code
         /// </summary>
         public const int ENTER_ROOM_BRO = 3;
         /// <summary>
-        /// 客户端进入房间请求
+        /// 客户端离开房间请求
         /// </summary>
         public const int LEAVE_ROOM_REQ = 4;
         /// <summary>

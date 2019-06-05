@@ -10,8 +10,8 @@ namespace FightLandlordServer.Timers
 {
     public class TimerManager
     {
-        private TimerManager instance;
-        public TimerManager Instance
+        private static TimerManager instance;
+        public static TimerManager Instance
         {
             get
             {
@@ -37,6 +37,7 @@ namespace FightLandlordServer.Timers
             timer.Elapsed += Timer_Elapsed;
             idModelDict = new ConcurrentDictionary<int, TimeModel>();
             removeList = new List<int>();
+            timer.Start();
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
