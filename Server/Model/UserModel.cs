@@ -25,15 +25,15 @@ namespace Server.Model
         /// <summary>
         /// 胜场
         /// </summary>
-        public int WinCount { get; set; }
+        public int Win { get; set; }
         /// <summary>
         /// 负场
         /// </summary>
-        public int FailCount { get; set; }
+        public int Fail { get; set; }
         /// <summary>
         /// 逃跑场
         /// </summary>
-        public int EscapeCount { get; set; }
+        public int Escape { get; set; }
         /// <summary>
         /// 等级
         /// </summary>
@@ -45,7 +45,7 @@ namespace Server.Model
         /// <summary>
         /// 账户ID(外键)
         /// </summary>
-        public int AccountId { get; set; }
+        public int Aid { get; set; }
         /// <summary>
         /// 无参构造函数
         /// </summary>
@@ -64,12 +64,12 @@ namespace Server.Model
             this.Id = id;
             this.Name = name;
             this.Been = 10000;
-            this.WinCount = 0;
-            this.FailCount = 0;
-            this.EscapeCount = 0;
+            this.Win = 0;
+            this.Fail = 0;
+            this.Escape = 0;
             this.Lv = 0;
             this.Exp = 0;
-            this.AccountId = accountId;
+            this.Aid = accountId;
         }
 
         /// <summary>

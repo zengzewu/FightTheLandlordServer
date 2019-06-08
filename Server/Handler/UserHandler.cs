@@ -64,7 +64,7 @@ namespace Server.Handler
                 return;
             }
             UserModel userModel = userModelCache.CreateUserModel(accid, name);
-            UserDto userDto = new UserDto(userModel.Id,userModel.Name, userModel.Been, userModel.WinCount, userModel.FailCount, userModel.EscapeCount, userModel.Lv, userModel.Exp);
+            UserDto userDto = new UserDto(userModel.Id,userModel.Name, userModel.Been, userModel.Win, userModel.Fail, userModel.Escape, userModel.Lv, userModel.Exp);
             client.Send(OpCode.USER, UserSubCode.CREATE_USER_SRES, userDto);
         }
         /// <summary>
@@ -84,7 +84,7 @@ namespace Server.Handler
                 return;
             }
             UserModel userModel = userModelCache.GetModelByAccid(accid);
-            UserDto userDto = new UserDto(userModel.Id,userModel.Name, userModel.Been, userModel.WinCount, userModel.FailCount, userModel.EscapeCount, userModel.Lv, userModel.Exp);
+            UserDto userDto = new UserDto(userModel.Id,userModel.Name, userModel.Been, userModel.Win, userModel.Fail, userModel.Escape, userModel.Lv, userModel.Exp);
             client.Send(OpCode.USER, UserSubCode.GET_USER_INFO_SRES, userDto);
             return;
         }

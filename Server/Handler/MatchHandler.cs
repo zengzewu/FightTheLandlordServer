@@ -131,7 +131,7 @@ namespace Server.Handler
                     return;
                 RoomModel room = roomCache.EnterRoom(userMode.Id, clientPeer);
                 //通知房间内玩家有新玩家加入,将新加入玩家的数据发送到其他玩家
-                UserDto userDto = new UserDto(userMode.Id, userMode.Name, userMode.Been, userMode.WinCount, userMode.FailCount, userMode.EscapeCount, userMode.Lv, userMode.Exp);
+                UserDto userDto = new UserDto(userMode.Id, userMode.Name, userMode.Been, userMode.Win, userMode.Fail, userMode.Escape, userMode.Lv, userMode.Exp);
                 room.Brocast(userDto, clientPeer, OpCode.MATCH, MatchCode.ENTER_ROOM_BRO);
                 //通知客户端匹配成功,放回房间数据模型
                 RoomDto roomDto = new RoomDto();
@@ -139,7 +139,7 @@ namespace Server.Handler
                 foreach (int uid in room.uidList.Keys)
                 {
                     UserModel temp = userModelCache.GetModelByUid(uid);
-                    UserDto userDtotemp = new UserDto(temp.Id, temp.Name, temp.Been, temp.WinCount, temp.FailCount, temp.EscapeCount, temp.Lv, temp.Exp);
+                    UserDto userDtotemp = new UserDto(temp.Id, temp.Name, temp.Been, temp.Win, temp.Fail, temp.Escape, temp.Lv, temp.Exp);
                     roomDto.Add(userDtotemp);
                 }
                 roomDto.readyuidList = room.uidReadyList;

@@ -3,8 +3,10 @@ using FightLandlordServer.Concurrent;
 using Server.Model;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
+using MySql.Data.MySqlClient;
 
 
 namespace Server.Cache
@@ -15,10 +17,6 @@ namespace Server.Cache
     public class AccountCache
     {
         /// <summary>
-        /// 账号名,账号模型字典
-        /// </summary>
-        private Dictionary<string, AccountModel> accModelDict;
-        /// <summary>
         /// 账号名,连接对象字典
         /// </summary>
         private Dictionary<string, ClientPeer> accClientPeer;
@@ -27,23 +25,12 @@ namespace Server.Cache
         /// </summary>
         private Dictionary<ClientPeer, string> clientPeerAcc;
         /// <summary>
-        /// 账号Id,客户端连接对象
-        /// </summary>
-        private Dictionary<int, AccountModel> idModelDict;
-        /// <summary>
-        /// 线程安全Int类型
-        /// </summary>
-        private ConcurrentInt concurrentInt;
-        /// <summary>
         /// 无参数构造函数
         /// </summary>
         public AccountCache()
         {
-            accModelDict = new Dictionary<string, AccountModel>();
             accClientPeer = new Dictionary<string, ClientPeer>();
             clientPeerAcc = new Dictionary<ClientPeer, string>();
-            idModelDict = new Dictionary<int, AccountModel>();
-            concurrentInt = new ConcurrentInt(-1);
         }
         /// <summary>
         /// 判断账号是否存在
@@ -52,7 +39,9 @@ namespace Server.Cache
         /// <returns>true存在,false不存在</returns>
         public bool IsExit(string acc)
         {
-            return accModelDict.ContainsKey(acc);
+            object obj = MySql.Data.MySqlClient.MySqlHelper.ExecuteScalar(ConfigString.ConnStr_fight_the_landord,
+                "select count(1) from account where aid=@aid", new MySqlParameter("@aid", acc));
+            return Convert.ToInt32(obj) > 0;
         }
         /// <summary>
         /// 创建账号
@@ -61,18 +50,9 @@ namespace Server.Cache
         /// <param name="pwd">账号密码</param>
         public void Create(string acc, string pwd)
         {
-            AccountModel model = new AccountModel(concurrentInt.Add_Get(), acc, pwd);
-            accModelDict.Add(model.acc, model);
-            idModelDict.Add(model.id, model);
-        }
-        /// <summary>
-        /// 根据账号获取模型
-        /// </summary>
-        /// <param name="acc">账号名</param>
-        /// <returns>账号模型</returns>
-        public AccountModel GetModel(string acc)
-        {
-            return accModelDict[acc];
+            MySqlHelper.ExecuteNonQuery(ConfigString.ConnStr_fight_the_landord,
+                "insert into account values(null,@aid,@pwd)", new MySqlParameter("@aid", acc),
+                new MySqlParameter("@pwd", pwd));
         }
 
         /// <summary>
@@ -82,7 +62,12 @@ namespace Server.Cache
         /// <returns></returns>
         public AccountModel GetModel(int id)
         {
-            return idModelDict[id];
+            DataRow dataRow = MySqlHelper.ExecuteDataRow(ConfigString.ConnStr_fight_the_landord, "select * from account where id=@id",
+                new MySqlParameter("@id", id));
+            int aid = Convert.ToInt32(dataRow["id"]);
+            string acc = dataRow["aid"].ToString();
+            string pwd = dataRow["pwd"].ToString();
+            return new AccountModel(aid, acc, pwd);
         }
 
         /// <summary>
@@ -93,8 +78,11 @@ namespace Server.Cache
         /// <returns>true匹配成功,false匹配失败</returns>
         public bool IsMactch(string acc, string pwd)
         {
-            AccountModel model = accModelDict[acc];
-            return model.pwd == pwd;
+            object obj = MySql.Data.MySqlClient.MySqlHelper.ExecuteScalar(ConfigString.ConnStr_fight_the_landord,
+                 "select count(1) from account where aid=@aid and pwd=@pwd", new MySqlParameter("@aid", acc),
+                 new MySqlParameter("@pwd", pwd));
+            return Convert.ToInt32(obj) > 0;
+
         }
         /// <summary>
         /// 判断用户是否在线
@@ -151,11 +139,14 @@ namespace Server.Cache
         /// <returns>账号名</returns>
         public int GetId(ClientPeer clientPeer)
         {
-            if(clientPeerAcc.ContainsKey(clientPeer))
+            if (clientPeerAcc.ContainsKey(clientPeer))
             {
                 string acc = clientPeerAcc[clientPeer];
-                AccountModel model = accModelDict[acc];
-                return model.id;
+
+                object obj = MySqlHelper.ExecuteScalar(ConfigString.ConnStr_fight_the_landord,
+                     "select id from account where aid=@aid", new MySqlParameter("@aid", acc));
+
+                return Convert.ToInt32(obj);
             }
             else
             {
@@ -169,7 +160,7 @@ namespace Server.Cache
         /// <returns></returns>
         public ClientPeer GetClientPeerByAcc(string accid)
         {
-            if(accClientPeer.ContainsKey(accid))
+            if (accClientPeer.ContainsKey(accid))
             {
                 return accClientPeer[accid];
             }

@@ -172,6 +172,7 @@ namespace Server.Handler
                 UserModel userModel = userModelCache.GetModelByUid(uid);
                 userModel.Been += room.Multiple * 100 * 2;
                 userModel.AddExp(20);
+                userModel.Win++;
                 userModelCache.Update(userModel);
                 #endregion
 
@@ -180,6 +181,7 @@ namespace Server.Handler
                 {
                     UserModel user = userModelCache.GetModelByUid(u.Uid);
                     user.Been -= room.Multiple * 100;
+                    user.Fail++;
                     user.AddExp(10);
                     userModelCache.Update(user);
                 });
@@ -193,6 +195,7 @@ namespace Server.Handler
                 {
                     UserModel user = userModelCache.GetModelByUid(u.Uid);
                     user.Been += room.Multiple * 100;
+                    user.Win++;
                     user.AddExp(20);
                     userModelCache.Update(user);
                 });
@@ -203,6 +206,7 @@ namespace Server.Handler
                 {
                     UserModel user = userModelCache.GetModelByUid(u.Uid);
                     user.Been -= room.Multiple * 100 * 2;
+                    user.Fail++;
                     user.AddExp(10);
                     userModelCache.Update(user);
                 });
@@ -213,6 +217,7 @@ namespace Server.Handler
             userModelCache.GetModelsByUids(room.EscapePlayerId).ForEach(u =>
             {
                 u.Been -= room.Multiple * 100;
+                u.Escape++;
                 userModelCache.Update(u);
 
             });
@@ -233,7 +238,7 @@ namespace Server.Handler
 
             //摧毁匹配房间
             RoomCache roomCache = Caches.RoomCache;
-            roomCache.DestoryRoom(roomCache.GetRoomModelByUid(room.GetFirstUid()));
+            roomCache.DestoryRoom(roomCache.GetRoomModelByUid(uid));
 
             //摧毁战斗房间
             fightRoomCache.DestoryRoom(room);
@@ -317,7 +322,7 @@ namespace Server.Handler
             foreach (var player in fightRoom.PlayerDtos)
             {
                 UserModel userModel = userModelCache.GetModelByUid(player.Uid);
-                AccountModel accountModel = accountCache.GetModel(userModel.AccountId);
+                AccountModel accountModel = accountCache.GetModel(userModel.Aid);
                 ClientPeer clientPeer = accountCache.GetClientPeerByAcc(accountModel.acc);
                 clientPeer.Send(OpCode.FIGHT, FightCode.GET_CARD_SRES, player.CardDtos);
             }
@@ -342,7 +347,7 @@ namespace Server.Handler
             foreach (var player in fightRoom.PlayerDtos)
             {
                 UserModel userModel = userModelCache.GetModelByUid(player.Uid);
-                AccountModel accountModel = accountCache.GetModel(userModel.AccountId);
+                AccountModel accountModel = accountCache.GetModel(userModel.Aid);
                 ClientPeer clientPeer = accountCache.GetClientPeerByAcc(accountModel.acc);
                 if (clientPeer != exClientPeer)
                     clientPeer.Send(packet);
